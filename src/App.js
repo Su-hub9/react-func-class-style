@@ -1,25 +1,127 @@
-import logo from './logo.svg';
+import React, {Component, useEffect, useState} from "react";
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    let [funcShow, setFuncShow] = useState(true);
+    let [classShow, setClassShow] = useState(true);
+    return (
+        <div className="container">
+            <h1>Hello World</h1>
+            <input type="button" value="remove func" onClick={function () {
+                setFuncShow(false);
+            }} />
+            <input type="button" value="remove class" onClick={function () {
+                setClassShow(false);
+            }} />
+            {funcShow ? <FuncComp initNumber={2} /> : null}
+            {classShow ? <ClassComp initNumber={2} /> : null}
+        </div>
+    );
+}
+
+let funcStyle = 'color:blue';
+let funcId = 0;
+function FuncComp(props) {
+    let numberState = useState(props.initNumber);
+    let number = numberState[0];
+    let setNumber = numberState[1];
+
+    /*const dateState = useState((new Date()).toString());
+    const _date = dateState[0];
+    const setDate = dateState[1];*/
+    let [_date, setDate] = useState((new Date()).toString());
+
+    useEffect(function() {
+        console.log('%cfunc => useEffect (componentDidMount) '+(++funcId), funcStyle)
+        document.title = number;
+        return function () {
+            console.log('%cfunc => useEffect return (componentWillUnMount) '+(++funcId), funcStyle)
+        }
+    }, []);
+
+    // side effect
+    useEffect(function() {
+        console.log('%cfunc => useEffect number (componentDidMount & componentDidUpdate) '+(++funcId), funcStyle)
+        document.title = number;
+        return function () {
+            console.log('%cfunc => useEffect number return '+(++funcId), funcStyle)
+        }
+    }, [number]);
+
+    useEffect(function() {
+        console.log('%cfunc => useEffect _date (componentDidMount & componentDidUpdate) '+(++funcId), funcStyle)
+        document.title = _date;
+        return function () {
+            console.log('%cfunc => useEffect _date return '+(++funcId), funcStyle)
+        }
+    }, [_date]);
+
+    console.log('%cfunc => render '+(++funcId), funcStyle)
+    return (
+        <div className="container">
+            <h2>function style component</h2>
+            <p>Number : {number}</p>
+            <p>Date : {_date}</p>
+            <input type="button" value="random" onClick={
+                function () {
+                    setNumber(Math.random());
+                }
+            } />
+            <input type="button" value="date" onClick={
+                function () {
+                    setDate((new Date()).toString());
+                }
+            } />
+        </div>
+    );
+}
+
+let classStyle = 'color:red';
+class ClassComp extends Component {
+    state = {
+        number: this.props.initNumber,
+        date: (new Date()).toString()
+    }
+    componentWillMount() {
+        console.log('%cclass => componentWillMount', classStyle)
+    }
+    componentDidMount() {
+        console.log('%cclass => componentDidMount', classStyle)
+    }
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        console.log('%cclass => shouldComponentUpdate', classStyle)
+        return true;
+    }
+    componentWillUpdate(nextProps, nextState, nextContext) {
+        console.log('%cclass => componentWillUpdate', classStyle)
+    }
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log('%cclass => componentDidUpdate', classStyle)
+    }
+    componentWillUnmount() {
+        console.log('%cclass => componentWillUnmount', classStyle)
+    }
+
+    render() {
+        console.log('%cclass => render', classStyle)
+        return (
+            <div className="container">
+                <h2>class style component</h2>
+                <p>Number : {this.state.number}</p>
+                <p>Date : {this.state.date}</p>
+                <input type="button" value="random" onClick={
+                    function () {
+                        this.setState({number: Math.random()})
+                    }.bind(this)
+                } />
+                <input type="button" value="date" onClick={
+                    function () {
+                        this.setState({date: (new Date()).toString()})
+                    }.bind(this)
+                } />
+            </div>
+        )
+    }
 }
 
 export default App;
